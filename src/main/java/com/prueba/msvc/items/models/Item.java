@@ -1,5 +1,8 @@
 package com.prueba.msvc.items.models;
 
+import com.prueba.libs.mscv.commons.entities.Product;
+
+
 public class Item {
 
     private Product product;

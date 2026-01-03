@@ -10,8 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.prueba.libs.mscv.commons.entities.Product;
 import com.prueba.msvc.items.models.Item;
-import com.prueba.msvc.items.models.Product;
 
 @Primary
 @Service
@@ -47,6 +47,42 @@ public class ItemServiceWebClient implements ItemService {
                 .bodyToMono(Product.class)
                 .map(product -> new Item(product, 1))
                 .blockOptional();
+    }
+
+    @Override
+    public Product save(Product product) {
+        return client.build().post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(product)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .block();
+    }
+
+    @Override
+    public Product update(Product product, Long id) {
+        Map<String, Long> params = new HashMap<>();
+        params.put("id", id);
+        return client.build().put()
+                .uri("/{id}", params)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(product)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .block();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        Map<String, Long> params = new HashMap<>();
+        params.put("id", id);
+        client.build().delete()
+                .uri("/{id}", params)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 
 }
