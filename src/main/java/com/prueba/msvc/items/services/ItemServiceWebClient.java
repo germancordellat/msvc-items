@@ -17,15 +17,15 @@ import com.prueba.msvc.items.models.Item;
 @Service
 public class ItemServiceWebClient implements ItemService {
 
-    private final WebClient.Builder client;
+    private final WebClient client;
 
-    public ItemServiceWebClient(WebClient.Builder client) {
+    public ItemServiceWebClient(WebClient client) {
         this.client = client;
     }
 
     @Override
     public List<Item> findAll() {
-        return client.build().get()
+        return client.get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToFlux(Product.class)
@@ -40,7 +40,7 @@ public class ItemServiceWebClient implements ItemService {
     public Optional<Item> findById(Long id) {
         Map<String, Long> params = new HashMap<>();
         params.put("id", id);
-        return client.build().get()
+        return client.get()
                 .uri("/{id}", params)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -51,7 +51,7 @@ public class ItemServiceWebClient implements ItemService {
 
     @Override
     public Product save(Product product) {
-        return client.build().post()
+        return client.post()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(product)
@@ -64,7 +64,7 @@ public class ItemServiceWebClient implements ItemService {
     public Product update(Product product, Long id) {
         Map<String, Long> params = new HashMap<>();
         params.put("id", id);
-        return client.build().put()
+        return client.put()
                 .uri("/{id}", params)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -78,7 +78,7 @@ public class ItemServiceWebClient implements ItemService {
     public void deleteById(Long id) {
         Map<String, Long> params = new HashMap<>();
         params.put("id", id);
-        client.build().delete()
+        client.delete()
                 .uri("/{id}", params)
                 .retrieve()
                 .bodyToMono(Void.class)

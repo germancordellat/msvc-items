@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
@@ -39,8 +41,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 public class ItemController {
 
+    private final Logger logger = LoggerFactory.getLogger(ItemController.class);
+
     private final ItemService itemService;
-    private final CircuitBreakerFactory circuitBreakerFactory;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
     @Value("${configuracion.texto}")
     private String text;
@@ -48,15 +52,18 @@ public class ItemController {
     @Autowired
     private Environment env;
 
-    public ItemController(ItemService itemService, CircuitBreakerFactory circuitBreakerFactory) {
+    public ItemController(ItemService itemService, CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
         this.itemService = itemService;
         this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     @GetMapping
-    public List<Item> list(@RequestParam(name = "name", required = false) String nombre, @RequestHeader("token-request") String tokenRequest) {
-        System.out.println("nombre: " + nombre);
-        System.out.println("token-request: " + tokenRequest);
+    public List<Item> list(@RequestParam(name = "name", required = false) String nombre, @RequestHeader(name = "token-request", required = false) String tokenRequest) {
+        logger.info("Llamada a metodo del controller ItemController: list()");
+        logger.info("Token Request: " + tokenRequest);
+         if (nombre != null) {
+            logger.info("Filter by name: " + nombre);
+        }
         return itemService.findAll();
     }
 
@@ -65,6 +72,8 @@ public class ItemController {
         Map<String, String> json = new HashMap<>();
         json.put("text", text);
         json.put("port", port);
+        logger.info("Config text: " + text);
+        logger.info("Server port: " + port);
         if (env.getActiveProfiles().length > 0 && env.getActiveProfiles()[0].equals("dev")) {
             json.put("author.name", env.getProperty("configuracion.autor.nombre"));
             json.put("author.email", env.getProperty("configuracion.autor.email"));
@@ -116,18 +125,21 @@ public class ItemController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public Product create(@RequestBody Product product) {
+        logger.info("Creating product: " + product.getName());
         return itemService.save(product);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public Product update(@RequestBody Product product, @PathVariable Long id) {
+        logger.info("Updating product with id: " + id);
         return itemService.update(product, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
+        logger.info("Deleting product with id: " + id);
         itemService.deleteById(id);
     }
     

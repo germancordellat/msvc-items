@@ -1,7 +1,8 @@
 package com.prueba.msvc.items;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
+//import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,8 +14,13 @@ public class WebClientConfig {
     private String url;
 
     @Bean
-    @LoadBalanced
-    WebClient.Builder webClientBuilder() {
-        return WebClient.builder().baseUrl(url);
+    WebClient webClient(WebClient.Builder webClientBuilder, ReactorLoadBalancerExchangeFilterFunction lbFunction) {
+        return webClientBuilder.baseUrl(url).filter(lbFunction).build();
     }
+
+    // @Bean
+    // @LoadBalanced
+    // WebClient.Builder webClientBuilder() {
+    //     return WebClient.builder().baseUrl(url);
+    // }
 }

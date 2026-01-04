@@ -9,6 +9,7 @@ import com.prueba.libs.mscv.commons.entities.Product;
 import com.prueba.msvc.items.clients.ProductFeignClient;
 import com.prueba.msvc.items.models.Item;
 
+
 @Service
 public class ItemServiceFeign implements ItemService {
 
